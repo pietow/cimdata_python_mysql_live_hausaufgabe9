@@ -1,0 +1,406 @@
+{
+  "info": {
+    "name": "Tag9 – Hausaufgabe Hogwarts",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "Reihenfolge einhalten. Vom Seeder erzeugte lokale Umgebung auswählen. Keine Fachdatensätze werden verändert."
+  },
+  "item": [
+    {
+      "name": "Anmelden: mcgonagall",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{base_url}}/auth/login",
+        "auth": {
+          "type": "noauth"
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\"username\": \"mcgonagall\", \"password\": \"{{password}}\"}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status 200', () => pm.response.to.have.status(200));",
+              "if (pm.response.code === 200) pm.environment.set('staff_token', pm.response.json().access_token);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Anmelden: flitwick",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{base_url}}/auth/login",
+        "auth": {
+          "type": "noauth"
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\"username\": \"flitwick\", \"password\": \"{{password}}\"}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status 200', () => pm.response.to.have.status(200));",
+              "if (pm.response.code === 200) pm.environment.set('reader_token', pm.response.json().access_token);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "01 Ohne Anmeldung",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{base_url}}/students/{{harry_id}}/booking-summary",
+        "auth": {
+          "type": "noauth"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status 401', () => pm.response.to.have.status(401));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "02 Reader abweisen",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{base_url}}/students/{{harry_id}}/booking-summary",
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{reader_token}}",
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status 403', () => pm.response.to.have.status(403));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "03 Unbekannter Schüler",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{base_url}}/students/{{missing_id}}/booking-summary",
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{staff_token}}",
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status 404', () => pm.response.to.have.status(404));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "04/05 Harry Potter",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{base_url}}/students/{{harry_id}}/booking-summary",
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{staff_token}}",
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status 200', () => pm.response.to.have.status(200));",
+              "if (pm.response.code === 200) {",
+              "pm.test('Vollständige Antwort', () => pm.expect(pm.response.json()).to.deep.equal({student_id:Number(pm.environment.get('harry_id')), student_name:'Harry Potter', booking_count:3}));",
+              "}"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "04/05 Hermione Granger",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{base_url}}/students/{{hermione_id}}/booking-summary",
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{staff_token}}",
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status 200', () => pm.response.to.have.status(200));",
+              "if (pm.response.code === 200) {",
+              "pm.test('Vollständige Antwort', () => pm.expect(pm.response.json()).to.deep.equal({student_id:Number(pm.environment.get('hermione_id')), student_name:'Hermione Granger', booking_count:1}));",
+              "}"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "04/05 Neville Longbottom",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{base_url}}/students/{{neville_id}}/booking-summary",
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{staff_token}}",
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status 200', () => pm.response.to.have.status(200));",
+              "if (pm.response.code === 200) {",
+              "pm.test('Vollständige Antwort', () => pm.expect(pm.response.json()).to.deep.equal({student_id:Number(pm.environment.get('neville_id')), student_name:'Neville Longbottom', booking_count:0}));",
+              "}"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "06 Ungültige ID 0",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{base_url}}/students/0/booking-summary",
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{staff_token}}",
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status 422', () => pm.response.to.have.status(422));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "06 Ungültige ID -1",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{base_url}}/students/-1/booking-summary",
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{staff_token}}",
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status 422', () => pm.response.to.have.status(422));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "06 Ungültige ID kein-integer",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{base_url}}/students/kein-integer/booking-summary",
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{staff_token}}",
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status 422', () => pm.response.to.have.status(422));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Abmelden staff",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "url": "{{base_url}}/auth/logout",
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{staff_token}}",
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status 204', () => pm.response.to.have.status(204));",
+              "pm.environment.unset('staff_token');"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Abmelden reader",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "url": "{{base_url}}/auth/logout",
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{reader_token}}",
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status 204', () => pm.response.to.have.status(204));",
+              "pm.environment.unset('reader_token');"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}
