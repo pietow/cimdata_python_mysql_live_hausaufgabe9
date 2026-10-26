@@ -9,7 +9,7 @@ das ungelöste Startgerüst und die dafür benötigten Teile des Kursprojekts.
 Beginnt mit dem [Hausaufgabenblatt](docs/hausaufgaben/09-Buchungsübersicht.md).
 Es beschreibt das vollständige Setup, die Aufgaben, die Prüfungen und die Abgabe.
 Die Abgabe erfolgt über euer eigenes GitHub-Repository bis **Freitag, 30. Oktober
-2026, 14:00 Uhr (Berliner Zeit)**. Anschließend findet das Codegespräch statt.
+2026, 14:00 Uhr**. Anschließend findet das Codegespräch statt.
 Die Git-Befehle stehen im Abgabeabschnitt des Hausaufgabenblatts.
 Die [Postman-Collection](docs/postman/09-Hausaufgabe.postman_collection.json)
 unterstützt euch beim manuellen Prüfen der Hausaufgaben-API.
@@ -74,8 +74,3 @@ Die Postman-Collection wird mitgeliefert. Nur die lokale Environment-Datei
 `hausaufgabe9.postman_environment.json` wird mit `python -m hausaufgabe9.seed`
 erzeugt. Die vollständige Request-Übersicht steht im Hausaufgabenblatt.
 
-## Für die Weitergabe
-
-- Den gesamten Projektordner ohne `Dozent/` weitergeben.
-- Keine Teilnehmerdatei benötigt Dateien aus `Dozent/`.
-- Lokale `.env`-Dateien, `.venv` und die erzeugte Postman-Umgebung nicht weitergeben.
